@@ -1,9 +1,7 @@
 import whisper
 import streamlit as st
-import sounddevice as sd
 from scipy.io import wavfile
 from audio_recorder_streamlit import audio_recorder
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
 @st.cache_resource()
 def load_model(name):
