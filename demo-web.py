@@ -9,7 +9,12 @@ def load_model(name):
     model = whisper.load_model(name)
     return model
 
-model = load_model("small")
+placeholder = st.empty()
+placeholder.caption("Loading Model (May take upto an hour depending on your internet connection)")
+
+model = load_model("large")
+placeholder.empty()
+
 
 def transcribe_audio_recording():
 
