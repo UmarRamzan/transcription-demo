@@ -14,32 +14,31 @@ model = load_model("small")
 def transcribe_audio_recording():
 
     if model is None:
-        st.sidebar.error("Model not loaded")
+        st.error("Model not loaded")
 
     elif audio_bytes is None:
-        st.sidebar.error("Please record audio")
+        st.error("Please record audio")
 
     else:
-        st.sidebar.info("Transcribing Audio")
-        transcription = model.transcribe('recording.wav', task="translate", language="urdu")
-        st.sidebar.success("Transcription Complete")
-        st.header("Transcription")
-        st.text(transcription['text'])
+        with st.spinner('Transcribing Audio'):
+            transcription = model.transcribe('recording.wav', task="translate", language="urdu")
+            st.subheader("Transcription")
+            st.markdown(transcription['text'])
     
 def transcribe_audio_file():
     
         if model is None:
-            st.sidebar.error("Model not loaded")
+            st.error("Model not loaded")
     
         elif audio_file is None:
-            st.sidebar.error("Please upload an audio file")
+            st.error("Please upload an audio file")
     
         else:
-            st.sidebar.info("Transcribing Audio")
-            transcription = model.transcribe('file.wav', task="translate", language="urdu")
-            st.sidebar.success("Transcription Complete")
-            st.subheader("Transcription")
-            st.text(transcription['text'])
+            with st.spinner('Transcribing Audio'):
+                transcription = model.transcribe('file.wav', task="translate", language="urdu")
+                st.subheader("Transcription")
+                st.markdown(transcription['text'])
+            
 
 st.title("Transcription Demo")
 
@@ -53,17 +52,20 @@ if audio_bytes:
     with open('recording.wav', mode='bw') as f:
         f.write(audio_bytes)
 
+if st.button("Transcribe Audio Recording"):
+    transcribe_audio_recording()
+
+st.divider()
+
 audio_file = st.file_uploader("Upload Audio", type=["wav", "mp3", "m4a"])
+
 if audio_file:
     st.audio(audio_file)
 
     with open('file.wav', mode='bw') as f:
         f.write(audio_file.read())
 
-st.divider()
-    
-if st.sidebar.button("Transcribe Audio Recording"):
-    transcribe_audio_recording()
-
-if st.sidebar.button("Transcribe Audio File"):
+if st.button("Transcribe Audio File"):
     transcribe_audio_file()
+
+st.divider()
