@@ -1,47 +1,62 @@
 import whisper
-import ffmpeg
+import pprint
+import replicate
 import streamlit as st
 from scipy.io import wavfile
 from audio_recorder_streamlit import audio_recorder
+
+
+
+REPLICATE_API_TOKEN = ["3ba23061728c35d52d41f6b36e40b9e169608739"]
 
 @st.cache_resource()
 def load_model(name):
     model = whisper.load_model(name)
     return model
 
-placeholder = st.empty()
-placeholder.caption("Loading Model (May take upto an hour depending on your internet connection)")
+#placeholder = st.empty()
+#placeholder.caption("Loading Model (May take upto an hour depending on your internet connection)")
 
-model = load_model("medium")
-placeholder.empty()
+#model = load_model("tiny")
+#placeholder.empty()
 
 def transcribe_audio_recording():
 
-    if model is None:
-        st.error("Model not loaded")
-
-    elif audio_bytes is None:
+    if audio_bytes is None:
         st.error("Please record audio")
 
     else:
         with st.spinner('Transcribing Audio'):
-            transcription = model.transcribe('recording.wav', task="translate", language="urdu")
+
+            #transcription = model.transcribe('recording.wav', task="translate", language="urdu")
+            transcription = replicate.run(
+                "openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                input={"model": "large", "audio": open("recording.wav", "rb"), "translate": True, "language": "ur"}
+            )
+            
             st.subheader("Transcription")
-            st.markdown(transcription['text'])
+
+            #st.markdown(transcription['text'])
+            st.markdown(transcription['translation'])
     
 def transcribe_audio_file():
-    
-        if model is None:
-            st.error("Model not loaded")
-    
-        elif audio_file is None:
+        
+        if audio_file is None:
             st.error("Please upload an audio file")
     
         else:
             with st.spinner('Transcribing Audio'):
-                transcription = model.transcribe('file.wav', task="translate", language="urdu")
+
+                # transcription = model.transcribe('file.wav', task="translate", language="urdu")
+                transcription = replicate.run(
+                    "openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                    input={"model": "large", "audio": open("file.wav", "rb"), "translate": True, "language": "ur"}
+                )
+                
                 st.subheader("Transcription")
-                st.markdown(transcription['text'])
+                
+                #st.markdown(transcription['text'])
+                st.markdown(transcription['translation'])
             
 
 st.title("Transcription Demo")
