@@ -12,9 +12,8 @@ def load_model(name):
 placeholder = st.empty()
 placeholder.caption("Loading Model (May take upto an hour depending on your internet connection)")
 
-model = load_model("large")
+model = load_model("medium")
 placeholder.empty()
-
 
 def transcribe_audio_recording():
 
