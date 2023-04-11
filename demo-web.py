@@ -1,5 +1,5 @@
 import whisper
-import pprint
+import ffmpeg
 import replicate
 import streamlit as st
 from scipy.io import wavfile
