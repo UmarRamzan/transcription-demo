@@ -1,45 +1,62 @@
 import whisper
 import streamlit as st
+import sounddevice as sd
+from scipy.io import wavfile
+from audio_recorder_streamlit import audio_recorder
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
-print(whisper.__version__)
-print(st.__version__)
+@st.cache_resource()
+def load_model(name):
+    model = whisper.load_model(name)
+    return model
 
-class scribe:
+model = load_model("small")
 
-    def __init__(self):
-        self.model = None
-        self.audio_file = None
-        self.transcription = None
+def transcribe_audio_recording():
 
-    @st.cache_data
-    def get_model(_self):
-        _self.model = whisper.load_model('base')
-        st.session_state.model = _self.model
-        st.sidebar.success("Model Loaded")
+    if model is None:
+        st.sidebar.error("Model not loaded")
 
-    def transcribe_audio(self):
-        if st.session_state.model is None:
-            st.sidebar.error("Please load the model first")
-        elif self.audio_file is None:
+    elif audio_bytes is None:
+        st.sidebar.error("Please record audio")
+
+    else:
+        transcription = model.transcribe('recording.wav', task="translate", language="urdu")
+        st.header("Transcription")
+        st.text(transcription['text'])
+    
+def transcribe_audio_file():
+    
+        if model is None:
+            st.sidebar.error("Model not loaded")
+    
+        elif audio_file is None:
             st.sidebar.error("Please upload an audio file")
+    
         else:
-            st.sidebar.success("Transcribing Audio")
-            self.transcription = st.session_state.model.transcribe(self.audio_file.name)
-            st.sidebar.success("Transcription Complete")
-            st.text(self.transcription['text'])
-
-
-transcriber = scribe()
+            transcription = model.transcribe('file.wav', task="translate", language="urdu")
+            st.subheader("Transcription")
+            st.text(transcription['text'])
 
 st.title("Transcription Demo")
 
-audio_file = st.file_uploader("Upload Audio", type=["wav", "mp3", "m4a"])
+audio_bytes = audio_recorder(energy_threshold=-10, pause_threshold=10, icon_size="2x")
 
-if st.sidebar.button("Load Model"):
-    transcriber.get_model()
+if audio_bytes:
+    st.audio(audio_bytes, format="audio/wav")
+
+    with open('recording.wav', mode='bw') as f:
+        f.write(audio_bytes)
+
+audio_file = st.file_uploader("Upload Audio", type=["wav", "mp3", "m4a"])
+if audio_file:
+    st.audio(audio_file)
+
+    with open('file.wav', mode='bw') as f:
+        f.write(audio_file.read())
     
-if st.sidebar.button("Transcribe Audio"):
-    transcriber.transcribe_audio()
-        
-st.sidebar.header("Original Audio")
-st.sidebar.audio(audio_file)
+if st.sidebar.button("Transcribe Audio Recording"):
+    transcribe_audio_recording()
+
+if st.sidebar.button("Transcribe Audio File"):
+    transcribe_audio_file()
