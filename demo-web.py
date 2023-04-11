@@ -20,7 +20,9 @@ def transcribe_audio_recording():
         st.sidebar.error("Please record audio")
 
     else:
+        st.sidebar.info("Transcribing Audio")
         transcription = model.transcribe('recording.wav', task="translate", language="urdu")
+        st.sidebar.success("Transcription Complete")
         st.header("Transcription")
         st.text(transcription['text'])
     
@@ -33,11 +35,15 @@ def transcribe_audio_file():
             st.sidebar.error("Please upload an audio file")
     
         else:
+            st.sidebar.info("Transcribing Audio")
             transcription = model.transcribe('file.wav', task="translate", language="urdu")
+            st.sidebar.success("Transcription Complete")
             st.subheader("Transcription")
             st.text(transcription['text'])
 
 st.title("Transcription Demo")
+
+st.divider()
 
 audio_bytes = audio_recorder(energy_threshold=-10, pause_threshold=10, icon_size="2x")
 
@@ -53,6 +59,8 @@ if audio_file:
 
     with open('file.wav', mode='bw') as f:
         f.write(audio_file.read())
+
+st.divider()
     
 if st.sidebar.button("Transcribe Audio Recording"):
     transcribe_audio_recording()

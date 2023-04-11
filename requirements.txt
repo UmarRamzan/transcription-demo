@@ -1,6 +1,6 @@
 audio_recorder_streamlit==0.0.8
-ffmpeg==1.4
 ffmpeg_python==0.2.0
+ffmpeg==1.4
 openai_whisper==20230314
 scipy==1.9.1
 streamlit==1.21.0
