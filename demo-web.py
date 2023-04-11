@@ -5,20 +5,27 @@ import streamlit as st
 from scipy.io import wavfile
 from audio_recorder_streamlit import audio_recorder
 
-
-
-REPLICATE_API_TOKEN = ["3ba23061728c35d52d41f6b36e40b9e169608739"]
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
 @st.cache_resource()
 def load_model(name):
     model = whisper.load_model(name)
     return model
 
-#placeholder = st.empty()
-#placeholder.caption("Loading Model (May take upto an hour depending on your internet connection)")
+@st.cache_resource()
+def load_model_hugging_face():
+    # load model and processor
+    processor = WhisperProcessor.from_pretrained("openai/whisper-tiny")
+    model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny")
+    forced_decoder_ids = processor.get_decoder_prompt_ids(language="urdu", task="translate")
+
+placeholder = st.empty()
+placeholder.caption("Loading Model (May take upto an hour depending on your internet connection)")
 
 #model = load_model("tiny")
-#placeholder.empty()
+model = load_model_hugging_face()
+
+placeholder.empty()
 
 def transcribe_audio_recording():
 
@@ -28,16 +35,24 @@ def transcribe_audio_recording():
     else:
         with st.spinner('Transcribing Audio'):
 
-            #transcription = model.transcribe('recording.wav', task="translate", language="urdu")
-            transcription = replicate.run(
-                "openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                input={"model": "large", "audio": open("recording.wav", "rb"), "translate": True, "language": "ur"}
-            )
+            #transcription = model.transcribe('recording.wav', task="translate", language="urdu", word_timestamps=False)
+            #transcription = replicate.run(
+            #     "openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+            #     input={"audio": open("recording.wav", "rb"), "translate": True, "language": "ur"}
+            # )
+
+            input_array = wavfile.read('recording.wav')
+            print(input_array)
+            #input_features = processor(input_array, sampling_rate=input_speech["sampling_rate"], return_tensors="pt").input_features
+            # generate token ids
+            #predicted_ids = model.generate(input_features, forced_decoder_ids=forced_decoder_ids)
+            # decode token ids to text
+            #transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
             
             st.subheader("Transcription")
 
             #st.markdown(transcription['text'])
-            st.markdown(transcription['translation'])
+            #st.markdown(transcription['translation'])
     
 def transcribe_audio_file():
         
@@ -50,7 +65,7 @@ def transcribe_audio_file():
                 # transcription = model.transcribe('file.wav', task="translate", language="urdu")
                 transcription = replicate.run(
                     "openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                    input={"model": "large", "audio": open("file.wav", "rb"), "translate": True, "language": "ur"}
+                    input={"audio": open("file.wav", "rb"), "translate": True, "language": "ur"}
                 )
                 
                 st.subheader("Transcription")
