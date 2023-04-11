@@ -1,7 +1,8 @@
 import whisper
-import ffmpeg
 import streamlit as st
-from audio_recorder_streamlit import audio_recorder
+
+print(whisper.__version__)
+print(st.__version__)
 
 class scribe:
 
