@@ -1,4 +1,5 @@
 import whisper
+import ffmpeg
 import streamlit as st
 from scipy.io import wavfile
 from audio_recorder_streamlit import audio_recorder
